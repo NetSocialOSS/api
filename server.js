@@ -31,7 +31,7 @@ app.use(express.json());
 
 // Enable CORS with specific origin (replace http://localhost:3000 with your frontend's base URL)
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://beta.socialflux.xyz', 'https://socialflux.xyz', 'https://netsocial.app','https://beta.netsocial.app', 'http://localhost:8888'],
+  origin: ['http://localhost:3000', 'https://beta.socialflux.xyz', 'https://socialflux.xyz', 'https://netsocial.app','https://beta.netsocial.app', 'https://net-social-website.vercel.app'],
   credentials: true,
 };
 
