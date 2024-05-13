@@ -29,14 +29,24 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Middleware to parse request body as JSON
 app.use(express.json());
 
-// Enable CORS with specific origin (replace http://localhost:3000 with your frontend's base URL)
+app.use(cookieParser());
+
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://beta.socialflux.xyz',
+  'https://socialflux.xyz',
+  'https://netsocial.app',
+  'https://beta.netsocial.app',
+  'https://net-social-website.vercel.app'
+];
+
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://beta.socialflux.xyz', 'https://socialflux.xyz', 'https://netsocial.app','https://beta.netsocial.app', 'https://net-social-website.vercel.app'],
-  credentials: true,
+  origin: allowedOrigins,
+  credentials: true // Allow credentials
 };
 
 app.use(cors(corsOptions));
-app.use(cookieParser());
 
 // Use the routes
 app.use('/', indexRoutes); // Use the indexRoutes router for '/api' requests
@@ -59,4 +69,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
