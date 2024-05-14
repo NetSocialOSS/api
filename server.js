@@ -5,16 +5,14 @@ const userRoutes = require('./routes/user');
 const profileRoutes = require('./routes/profile');
 const indexRoutes = require('./routes/index');
 const postRoutes = require('./routes/post');
-const cors = require('cors'); // Import the cors package
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -26,9 +24,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error('Failed to connect to MongoDB:', error);
 });
 
-// Middleware to parse request body as JSON
 app.use(express.json());
-
 app.use(cookieParser());
 
 // CORS configuration
@@ -42,30 +38,36 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true // Allow credentials
 };
 
 app.use(cors(corsOptions));
 
-// Use the routes
-app.use('/', indexRoutes); // Use the indexRoutes router for '/api' requests
-app.use('/api', userRoutes); // Use the userRoutes router for '/api' requests
-app.use('/api', postRoutes); // Use the postRoutes router for '/api' requests
-app.use('/api/profile', profileRoutes); // Use the userRoutes router for '/api' requests
+// Preflight requests handling
+app.options('*', cors(corsOptions));
 
-// Handle 404 - Not Found
+app.use('/', indexRoutes);
+app.use('/api', userRoutes);
+app.use('/api', postRoutes);
+app.use('/api/profile', profileRoutes);
+
 app.use((req, res) => {
   res.status(404).json({ message: 'Not Found' });
 });
 
-// Handle errors
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
